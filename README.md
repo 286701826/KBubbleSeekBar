@@ -8,8 +8,9 @@
 - **进度变化由可视化气泡样式呈现，定制化程度较高**  
 - **实现带刻度的进度条实现颜色渐变效果**
 
-****
+---
 ## 整体效果如下：
+
 eg：![demo1](https://github.com/KosmoSakura/BubbleSeekBar/blob/master/show/showinit.gif)
 ---
 
@@ -17,133 +18,76 @@ eg：![demo1](https://github.com/KosmoSakura/BubbleSeekBar/blob/master/show/show
 
 ---
 
+### 主要代码
+#### 1.attr中新增属性：
 
-## Download
-The **LATEST_VERSION**：[![Download](https://api.bintray.com/packages/woxingxiao/maven/bubbleseekbar/images/download.svg)](https://bintray.com/woxingxiao/maven/bubbleseekbar/_latestVersion)
-```groovy
-  dependencies {
-     // lite version 轻量版（推荐）
-     // 例如：compile 'com.xw.repo:bubbleseekbar:3.16-lite'
-        compile 'com.xw.repo:bubbleseekbar:${LATEST_VERSION}-lite'
-     
-     // enhanced version 增强版
-     // 例如：compile 'com.xw.repo:bubbleseekbar:3.16'
-     // compile 'com.xw.repo:bubbleseekbar:${LATEST_VERSION}'
-  }
-```
-## Usage  
-### Init in xml
 ```xml
-<com.xw.repo.BubbleSeekBar
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:bsb_bubble_color="@color/color_red_light"
-    app:bsb_bubble_text_color="@color/colorPrimaryDark"
-    app:bsb_max="50.0"
-    app:bsb_min="-50"
-    app:bsb_progress="0"
-    app:bsb_second_track_color="@color/color_red"
-    app:bsb_section_count="5"
-    app:bsb_section_text_position="bottom_sides"
-    app:bsb_show_progress_in_float="true"
-    app:bsb_show_section_mark="true"
-    app:bsb_show_section_text="true"
-    app:bsb_show_thumb_text="true"
-    app:bsb_track_color="@color/color_red_light"/>
+<!--渐变色号，用_分割-->
+<attr name="bsb_colors" format="string"/>
+<!--是否显示刻度，默认：true-->
+<attr name="bsb_marks" format="boolean"/>
 ```
+
+#### 2.布局示例
+
 ```xml
-<com.xw.repo.BubbleSeekBar
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    app:bsb_auto_adjust_section_mark="true"
-    app:bsb_second_track_color="@color/color_blue"
-    app:bsb_section_count="5"
-    app:bsb_section_text_position="below_section_mark"
-    app:bsb_show_section_mark="true"
-    app:bsb_show_section_text="true"
-    app:bsb_show_thumb_text="true"
-    app:bsb_thumb_text_size="18sp"
-    app:bsb_touch_to_seek="true"/>
+<cos.mos.sb.widget.KBubbleSeekBar
+        android:id="@+id/sb2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        kosmos:bsb_bubble_text_color="#24d1b4"
+        kosmos:bsb_colors="#ffffffff_#ff24d1b4_#ff000000"
+        kosmos:bsb_marks="false"
+        kosmos:bsb_max="100"
+        kosmos:bsb_min="0"
+        kosmos:bsb_progress="20"
+        kosmos:bsb_second_track_color="#15398e"
+        kosmos:bsb_section_count="5"
+        kosmos:bsb_section_text_position="below_section_mark"
+        kosmos:bsb_show_progress_in_float="true"
+        kosmos:bsb_show_section_mark="false"
+        kosmos:bsb_show_section_text="true"
+        kosmos:bsb_show_thumb_text="true"
+        kosmos:bsb_thumb_color="#ffffff"
+        kosmos:bsb_thumb_text_color="#cabf18"
+        kosmos:bsb_touch_to_seek="true"
+        kosmos:bsb_track_color="#d1cccc"
+        kosmos:bsb_track_size="14dp"/>
 ```
-### Init in java (not for **_lite_** version)
+
+#### 3.KBubbleSeekBar 关键代码
+
 ```java
-mBbubbleSeekBar.getConfigBuilder()
-               .min(0.0)
-               .max(50)
-               .progress(20)
-               .sectionCount(5)
-               .trackColor(ContextCompat.getColor(getContext(), R.color.color_gray))
-               .secondTrackColor(ContextCompat.getColor(getContext(), R.color.color_blue))
-               .thumbColor(ContextCompat.getColor(getContext(), R.color.color_blue))
-               .showSectionText()
-               .sectionTextColor(ContextCompat.getColor(getContext(), R.color.colorPrimary))
-               .sectionTextSize(18)
-               .showThumbText()
-               .thumbTextColor(ContextCompat.getColor(getContext(), R.color.color_red))
-               .thumbTextSize(18)
-               .bubbleColor(ContextCompat.getColor(getContext(), R.color.color_green))
-               .bubbleTextSize(18)
-               .showSectionMark()
-               .seekBySection()
-               .autoAdjustSectionMark()
-               .sectionTextPosition(BubbleSeekBar.TextPosition.BELOW_SECTION_MARK)
-               .build();
+public void sweepGradientInit() {
+        //渐变颜色.colors和pos的个数一定要相等
+        float[] pos = {0f, 0.5f, 1.0f};
+        linearGradient = new LinearGradient(0, 0, lySpace / 2, lySpace / 2, colors, pos, Shader.TileMode.REPEAT);
+        Matrix matrix = new Matrix();
+        linearGradient.setLocalMatrix(matrix);
+}
 ```
-查看demo获知更多使用细节。或者下载安装apk：[**sample.apk**](https://github.com/woxingxiao/BubbleSeekBar/raw/master/apk/sample.apk)
 
-## Attentions
-- 下列是两个版本的差异对比：  
+##### 说明：
 
-  version | init | getter/setter
-  -------- | ---|---
-  lite|xml|min, max, progress
-  enhanced|xml, java|all attrs
-  
-  推荐使用 **_lite_** 版本。
+- 控件的绘制顺序为：`onMeasure`-->`onLayout`-->`onDraw`
 
-- 如果`BubbleSeekBar`的外部容器是可滑动的控件（如：`ScrollView`，但`ViewPager`除外），需要设置滑动监听来修正气泡的偏移，
-否则滑动后气泡出现位置可能错乱。方法如下：
-```java
-   mContainer.setOnYourContainerScrollListener(new OnYourContainerScrollListener() {
-       @Override
-       public void onScroll() {
-           // 调用修正偏移方法
-           mBubbleSeekBar.correctOffsetWhenContainerOnScrolling();
-       }
-   });
-```
-- 当自定义section texts的时候，你首先需要确保属性 `bsb_section_text_position` 已经被设置为 `below_section_mark`，
-然后在java代码中参照以下代码实现你自己的需求：
-```java
-   mBubbleSeekBar.setCustomSectionTextArray(new BubbleSeekBar.CustomSectionTextArray() {
-       @NonNull
-       @Override
-       public SparseArray<String> onCustomize(int sectionCount, @NonNull SparseArray<String> array) {
-           array.clear();
-           array.put(1, "bad");
-           array.put(4, "ok");
-           array.put(7, "good");
-           array.put(9, "great");
+- 这里用到`android` `api`提供的线性渐变工具：`LinearGradient`
 
-           return array;
-       }
-   });
-```
-顺便，为了防止文字覆盖显示问题，属性`bsb_show_thumb_text`将被自动置`false`。
-- 属性`bsb_always_show_bubble`在`RecyclerView`,`ListView`和`GridView`中不被支持。
+- - 这里，LinearGradient的构造函数内传入的几个参数
+  - `(x0,y0)`: 起始渐变点坐标
+  - `(x1,y1)`: 结束渐变点坐标
+  - `colors[]`: 用于指定渐变的颜色值数组 
+  - `positions[]`: 与渐变的颜色相对应，取值是0-1的float类型
+  - `TileMode tile`：指定控件区域大于指定的渐变区域时，空白区域颜色填充方法
 
-## Attributes
-[attr.xml](https://github.com/woxingxiao/BubbleSeekBar/blob/master/bubbleseekbar/src/main/res/values/attr.xml)
-## 怎样提出有效的issue
-- **确保你使用的是最新版本。** 如果仍然有问题，请开新issue；
-- 尽可能详细的描述crash发生时的使用场景或者操作（有图片说明更好）；
-- 告知手机型号和系统版本；
-- 贴出你的xml或者java代码；
-- 贴出你的奔溃日志；
-- 礼貌。
+##### 关于渐变色的注意事项：
 
---------
-> **人生苦短，请选择科学上网。推荐一下本人正在使用的，稳定高速，便宜好用。[推介链接](https://portal.shadowsocks.com.la/aff.php?aff=8881)**  
+![demo1](https://github.com/KosmoSakura/BubbleSeekBar/blob/master/show/notice.gif)
+
+- 1.`colors[]`与`positions[]`的长度要一一对应
+- 2.`bsb_colors="#ffffffff_#ff24d1b4_#ff000000"`内的色值必须带alpha通道
+
 
 ## License
 ```
