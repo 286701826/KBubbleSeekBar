@@ -10,7 +10,7 @@
 
 ****
 ## 整体效果如下：
-eg：![demo1](https://github.com/KosmoSakura/BubbleSeekBar/blob/master/show/2.gif)
+eg：![demo1](https://github.com/KosmoSakura/BubbleSeekBar/blob/master/show/showinit.gif)
 ---
 
 基于[woxingxiao的BubbleSeekBar](https://github.com/woxingxiao/BubbleSeekBar)修改
