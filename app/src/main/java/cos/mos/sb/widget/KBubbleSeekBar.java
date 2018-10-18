@@ -158,9 +158,9 @@ public class KBubbleSeekBar extends View {
         mTrackSize = ta.getDimensionPixelSize(R.styleable.KBubbleSeekBar_bsb_track_size, dp2px(2));
         mSecondTrackSize = ta.getDimensionPixelSize(R.styleable.KBubbleSeekBar_bsb_second_track_size,
             mTrackSize + dp2px(2));
-        mThumbRadius = ta.getDimensionPixelSize(R.styleable.KBubbleSeekBar_bsb_thumb_radius, mTrackSize - dp2px(2));
+       mThumbRadius = ta.getDimensionPixelSize(R.styleable.KBubbleSeekBar_bsb_thumb_radius, mSecondTrackSize / 2 + dp2px(1));
         mThumbRadiusOnDragging = ta.getDimensionPixelSize(R.styleable.KBubbleSeekBar_bsb_thumb_radius_on_dragging,
-            (int) (mThumbRadius * 1.5));
+            mThumbRadius + dp2px(2));
         mSectionCount = ta.getInteger(R.styleable.KBubbleSeekBar_bsb_section_count, 10);
         mTrackColor = ta.getColor(R.styleable.KBubbleSeekBar_bsb_track_color,
             ContextCompat.getColor(context, R.color.colorPrimary));
@@ -449,13 +449,15 @@ public class KBubbleSeekBar extends View {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         lySpace = getMeasuredWidth();
         sweepGradientInit();
-        int height = mThumbRadiusOnDragging * 2; // 默认高度为拖动时thumb圆的直径
+        // 默认高度为拖动时thumb圆的直径
+        int height = mThumbRadiusOnDragging * 2; 
         if (isShowThumbText) {
             mPaint.setTextSize(mThumbTextSize);
             mPaint.getTextBounds("j", 0, 1, mRectText); // j is the highest of all letters and numbers
             height += mRectText.height(); // 如果显示实时进度，则原来基础上加上进度文字高度和间隔
         }
-        if (isShowSectionText && mSectionTextPosition >= BOTTOM_SIDES) { // 如果Section值在track之下显示，比较取较大值
+        // 如果Section值在track之下显示，比较取较大值
+        if (isShowSectionText && mSectionTextPosition >= BOTTOM_SIDES) { 
             mPaint.setTextSize(mSectionTextSize);
             mPaint.getTextBounds("j", 0, 1, mRectText);
             height = Math.max(height, mThumbRadiusOnDragging * 2 + mRectText.height());
@@ -571,6 +573,7 @@ public class KBubbleSeekBar extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        setLayerType(LAYER_TYPE_SOFTWARE, null);//对单独的View在运行时阶段禁用硬件加速
         float xLeft = getPaddingLeft();
         float xRight = getMeasuredWidth() - getPaddingRight();
         float yTop = getPaddingTop() + mThumbRadiusOnDragging;
@@ -705,9 +708,20 @@ public class KBubbleSeekBar extends View {
             canvas.drawLine(mThumbCenterX, yTop, xRight, yTop, mPaint);
         }
 
-        // draw thumb
+
         mPaint.setColor(mThumbColor);
-        canvas.drawCircle(mThumbCenterX, yTop, isThumbOnDragging ? mThumbRadiusOnDragging : mThumbRadius, mPaint);
+        if (isThumbOnDragging) {
+            //绘制拖动中的Thumb
+            //绘制拖动中的阴影：阴影半径，阴影x坐标偏移，阴影y坐标偏移，阴影颜色
+            mPaint.setShadowLayer(5f, 0, 3, Color.GRAY);
+            canvas.drawCircle(mThumbCenterX, yTop, mThumbRadiusOnDragging, mPaint);
+        } else {
+            //绘制静止状态Thumb
+            //绘制静止状态阴影：阴影半径，阴影x坐标偏移，阴影y坐标偏移，阴影颜色
+            mPaint.setShadowLayer(5f, 0, 1, Color.GRAY);
+            canvas.drawCircle(mThumbCenterX, yTop, mThumbRadius, mPaint);
+        }
+        mPaint.setShadowLayer(0, 0, 0, Color.GRAY);//关闭阴影
     }
 
     @Override
